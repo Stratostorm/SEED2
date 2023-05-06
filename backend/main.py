@@ -82,7 +82,7 @@ def hashpassword():
     return "<h1>Hashed</h1>"
         
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST','GET'])
 def login():
     if request.method == "POST":
             data = request.json
@@ -101,14 +101,15 @@ def login():
 
 
             result = check_password_hash(res["Password"], str(password))
-
+            
             if result:
                 access_token = create_access_token(identity=res["EmployeeID"])
-                login_user(res)
+                #login_user(res)
                 print(access_token)
                 return {"token": access_token}
             else:
                 return {"message": "Failed to login!"}, 400
+        
 
 @app.route('/DepartmentData', methods=['POST', 'GET'])
 def DepartmentData():
