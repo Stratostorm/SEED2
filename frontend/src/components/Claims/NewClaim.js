@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import axios from "axios";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -22,28 +19,38 @@ async function GetName(token, setFirstName, setLastName) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/name", config).then((response) => {
-    const data = response.data();
-    setFirstName(data.FirstName);
-    setLastName(data.LastName);
-  });
+  axios.get(apiURL + "/name", config).then(
+    (response) => {
+      const data = response.data();
+      setFirstName(data.FirstName);
+      setLastName(data.LastName);
+    },
+    (error) => {
+      setFirstName("John");
+      setLastName("Doe");
+    }
+  );
 }
 
 async function GetData(token, setCurrencies, setProjects) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/listdata", config).then((response) => {
-    const data = response.data();
-    setCurrencies(data.currencies);
-    setProjects(data.projects);
-  });
-  setCurrencies(["SGD", "USD", "CNY", "HKD"]);
-  setProjects(["0001", "0002", "0003", "0004"]);
+  axios.get(apiURL + "/listdata", config).then(
+    (response) => {
+      const data = response.data();
+      setCurrencies(data.currencies);
+      setProjects(data.projects);
+    },
+    (error) => {
+      setCurrencies(["SGD", "USD", "CNY", "HKD"]);
+      setProjects(["0001", "0002", "0003", "0004"]);
+    }
+  );
 }
 
 export default function NewClaim({ token }) {
-  const [isFollowUp, handleFollowUp] = useState(false);
+  const [isFollowUp, setIsFollowUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [currencies, setCurrencies] = useState([]);
@@ -52,6 +59,10 @@ export default function NewClaim({ token }) {
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+  }
+
+  function handleFollowUp(e) {
+    setIsFollowUp(e.target.checked);
   }
 
   useEffect(() => {
@@ -77,7 +88,6 @@ export default function NewClaim({ token }) {
         <Stack
           direction="column"
           spacing={1}
-          container
           component="form"
           onSubmit={handleSubmit}
           noValidate
@@ -110,7 +120,7 @@ export default function NewClaim({ token }) {
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
             <DatePicker
               id="date"
-              label="Date *"
+              label="Date of Expense *"
               name="date"
               format="DD/MM/YYYY"
               sx={{ width: { xs: 1, sm: 0.5 } }}
@@ -122,6 +132,7 @@ export default function NewClaim({ token }) {
               name="projectId"
               helperText="Select relevant Project ID"
               select
+              defaultValue=""
               sx={{ width: { xs: 1, sm: 0.5 } }}
             >
               {projects.map((option) => (
@@ -131,6 +142,14 @@ export default function NewClaim({ token }) {
               ))}
             </TextField>
           </Stack>
+          <TextField
+              required
+              id="purpose"
+              label="Purpose"
+              name="purpose"
+              multiline
+              fullWidth
+            />
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
             <TextField
               required
@@ -138,6 +157,7 @@ export default function NewClaim({ token }) {
               label="Currency"
               name="currency"
               select
+              defaultValue=""
               sx={{ width: { xs: 1, sm: 0.3 } }}
             >
               {currencies.map((option) => (
@@ -174,14 +194,27 @@ export default function NewClaim({ token }) {
               />
             )}
           </FormGroup>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
             sx={{ mt: 3, mb: 2 }}
           >
-            Submit
-          </Button>
+            <Button
+              type="button"
+              variant="contained"
+              color="warning"
+              sx={{  width: { xs: 1, sm: 0.5 }}}
+            >
+              Back
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ width: { xs: 1, sm: 0.5 }}}
+            >
+              Submit
+            </Button>
+          </Stack>
         </Stack>
       </Box>
     </Container>
