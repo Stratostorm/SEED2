@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 export default function Dashboard({setToken}) {
   const [employeeName, setEmployeeName] = useState();
   const [tableData, setTableData] = useState([]);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
 
   const handleLogout = () => {
@@ -30,9 +30,6 @@ export default function Dashboard({setToken}) {
     setToken(null);
   };
 
-  function HandleEdit(row) {
-    navigate('/EditClaim', { state: { row } });
-  }
   
 
   const handleDelete = (claimID) => {
@@ -102,7 +99,7 @@ export default function Dashboard({setToken}) {
                         color="primary"
                         sx={{ ml: 2 }}
                         component={Link}
-                        onClick={() => HandleEdit(row)}
+                        to="/EditClaim"
                       >
                         Edit
                       </Button>
