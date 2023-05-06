@@ -54,9 +54,26 @@ def GetProjectExpenseClaimsData():
         data = request.json
         # Insert data into MongoDB
         ProjectExpenseClaimsData.update_one({ 'tables.name': 'projectexpenseclaims'},{'$push': {'tables.$[].columns': data}})
+        # need to add prev claim ID
+        # project ID needs to be existing project
 
         return 'Data added to ProjectExpenseClaims'
-    
+
+@app.route('/EmployeeDataName', methods=['GET'])
+def GetEmployeeName():
+    if request.method == "GET":
+        EmployeeID = '10001'
+
+        EmployeeData = db['Employee'].find()
+        EmployeeData = EmployeeData[0]['tables'][0]['columns']
+
+        res = {}
+        for employee in EmployeeData:
+            print('iterating')
+            if employee['EmployeeID'] == EmployeeID:
+                res =  {"FirstName": employee['FirstName'], "LastName": employee["LastName"]}
+
+        return jsonify(res)
 
 if __name__ == "__main__":
     app.run(debug=True)
