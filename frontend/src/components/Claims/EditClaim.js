@@ -16,17 +16,49 @@ import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-export default function EditClaim() {
+import { apiURL } from "../../Constants";
+
+async function GetName(token, setFirstName, setLastName) {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  axios.get(apiURL + "/name", config).then((response) => {
+    const data = response.data();
+    setFirstName(data.FirstName);
+    setLastName(data.LastName);
+  });
+}
+
+async function GetData(token, setCurrencies, setProjects) {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  axios.get(apiURL + "/listdata", config).then((response) => {
+    const data = response.data();
+    setCurrencies(data.currencies);
+    setProjects(data.projects);
+  });
+  setCurrencies(["SGD", "USD", "CNY", "HKD"]);
+  setProjects(["0001", "0002", "0003", "0004"]);
+}
+
+export default function EditClaim({token, formData}) {
   const [isFollowUp, handleFollowUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [currencies, setCurrencies] = useState([]);
   const [projects, setProjects] = useState([]);
-  
+
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
   }
+
+  useEffect(() => {
+    GetName(token, setFirstName, setLastName);
+    GetData(token, setCurrencies, setProjects);
+    return () => {};
+  }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects]);
 
   return (
     <Container component="main" maxWidth="sm">
