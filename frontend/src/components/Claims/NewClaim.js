@@ -3,60 +3,62 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import {apiURL} from "../../Constants";
+
+import { apiURL } from "../../Constants";
 
 async function GetName(token, setFirstName, setLastName) {
   const config = {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL+ "/name", config).then(response => {
+  axios.get(apiURL + "/name", config).then((response) => {
     const data = response.data();
     setFirstName(data.FirstName);
     setLastName(data.LastName);
-  })
+  });
 }
 
 async function GetData(token, setCurrencies, setProjects) {
-  axios.get(apiURL+ "/")
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  axios.get(apiURL + "/listdata", config).then((response) => {
+    const data = response.data();
+    setCurrencies(data.currencies);
+    setProjects(data.projects);
+  });
   setCurrencies(["SGD", "USD", "CNY", "HKD"]);
-  setProjects(["0001", "0002", "0003", "0004"])
-  
+  setProjects(["0001", "0002", "0003", "0004"]);
 }
 
 export default function NewClaim({ token }) {
-  const [isFollowUp, setIsFollowUp] = useState(false);
+  const [isFollowUp, handleFollowUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [currencies, setCurrencies] = useState([]);
   const [projects, setProjects] = useState([]);
-
 
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
   }
 
-  function handleFollowUp(e) {
-    setIsFollowUp(e.target.checked);
-  }
-
   useEffect(() => {
     GetName(token, setFirstName, setLastName);
     GetData(token, setCurrencies, setProjects);
-    return () => {}
-  }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects])
+    return () => {};
+  }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects]);
 
   return (
     <Container component="main" maxWidth="sm">
@@ -111,7 +113,7 @@ export default function NewClaim({ token }) {
               label="Date *"
               name="date"
               format="DD/MM/YYYY"
-              sx={{ width: {xs: 1, sm: 0.5} }}
+              sx={{ width: { xs: 1, sm: 0.5 } }}
             />
             <TextField
               required
@@ -120,7 +122,7 @@ export default function NewClaim({ token }) {
               name="projectId"
               helperText="Select relevant Project ID"
               select
-              sx={{ width: {xs: 1, sm: 0.5} }}
+              sx={{ width: { xs: 1, sm: 0.5 } }}
             >
               {projects.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -136,7 +138,7 @@ export default function NewClaim({ token }) {
               label="Currency"
               name="currency"
               select
-              sx={{ width: {xs: 1, sm: 0.3} }}
+              sx={{ width: { xs: 1, sm: 0.3 } }}
             >
               {currencies.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -149,12 +151,15 @@ export default function NewClaim({ token }) {
               id="amount"
               label="Amount"
               name="amount"
-              sx={{ width: {xs: 1, sm: 0.7} }}
+              sx={{ width: { xs: 1, sm: 0.7 } }}
             />
           </Stack>
           <FormGroup
             row
-            sx={{ height: {xs: 1, sm: "60px"}, justifyContent: "space-between" }}
+            sx={{
+              height: { xs: 1, sm: "60px" },
+              justifyContent: "space-between",
+            }}
           >
             <FormControlLabel
               control={<Switch onChange={handleFollowUp} />}
@@ -165,7 +170,7 @@ export default function NewClaim({ token }) {
                 id="prevClaimId"
                 label="Previous Claim ID"
                 name="prevClaimId"
-                sx={{ width: {xs: 1, sm: 0.6}, position: "right" }}
+                sx={{ width: { xs: 1, sm: 0.6 }, position: "right" }}
               />
             )}
           </FormGroup>
