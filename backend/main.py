@@ -43,6 +43,7 @@ def EmployeeProjectData():
 @app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET'])
 def GetProjectExpenseClaimsData():
     if request.method == "GET":
+        EmployeeID = '10001'
         ProjectExpenseClaimsData = db['ProjectExpenseClaims'].find()
         ProjectExpenseClaimsData = ProjectExpenseClaimsData[0]['tables'][0]['columns']
         return jsonify(ProjectExpenseClaimsData)
@@ -69,7 +70,6 @@ def GetEmployeeName():
 
         res = {}
         for employee in EmployeeData:
-            print('iterating')
             if employee['EmployeeID'] == EmployeeID:
                 res =  {"FirstName": employee['FirstName'], "LastName": employee["LastName"]}
 
