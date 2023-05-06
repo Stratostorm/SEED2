@@ -12,7 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route
-            path="/Dashboard/:eId"
+            path="/Dashboard"
             element={token ? <Dashboard /> : <Navigate to="/" />}
           />
         </Routes>
