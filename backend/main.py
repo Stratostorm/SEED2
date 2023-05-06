@@ -18,7 +18,7 @@ app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 # New MySQL DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/users'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/expenseclaimsdata'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:shinying@localhost/expenseclaimsdata'
 # Secret Key for CSRF Token
 app.config['SECRET_KEY'] = "password"
 
@@ -91,10 +91,34 @@ def login():
     return {"Result": result, "Result2": result2}
     '''
 
-
 class Currency(db.Model):
     CurrencyID = db.Column(db.String(3), primary_key=True)
-    ExchangeRate = db.Column(db.Numeric(precision=10, scale=10))
+    ExchangeRate = db.Column(db.Float)
+
+class Departments(db.Model):
+    DeparmentCode = db.Column(db.String(3), primary_key=True)
+    DeparmentName = db.Column(db.String(50))
+
+class EmployeeProjects(db.Model):
+    ProjectID = db.Column(db.Integer, primary_key=True)
+    EmployeeID = db.Column(db.Integer, db.ForeignKey('Employee.EmployeeID'))
+    ProjectName = db.Column(db.String(100))
+    ProjectStatus = db.Column(db.String(50))
+    ProjectBudget = db.Column(db.Float)
+    ProjectLeadID = db.Column(db.Integer)
+
+class ProjectExpenseClaims(db.Model):
+    ClaimID = db.Column(db.Integer, primary_key=True)
+    ProjectID = db.Column(db.Integer, db.ForeignKey('EmployeeProjects.ProjectID'))
+    EmployeeID = db.Column(db.Integer, db.ForeignKey('Employee.EmployeeID'))
+    currencyID = db.Column(db.String(3), db.ForeignKey('Currency.CurrencyID'))
+    ExpenseDate = db.Column(db.DateTime)
+    Amount = db.Column(db.Numeric(precision=10,scale=2))
+    Purpose = db.Column(db.String(255))
+    ChargeToDefaultDept = db.Column(db.Boolean)
+    AlternativeDefaultDept = db.Column(db.String(50))
+    Status = db.Column(db.String(20))
+    LastEditedClaimDate = db.Column(db.DateTime)
 
 class Employee(db.Model):
     EmployeeID = db.Column(db.Integer, primary_key=True)
