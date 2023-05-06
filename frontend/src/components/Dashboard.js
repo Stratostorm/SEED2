@@ -12,19 +12,39 @@ import {
   Container,
   Paper,
   TableContainer,
+  IconButton,
 } from "@mui/material";
+import { Delete } from "@mui/icons-material";
 
 export default function Dashboard() {
-  const employeeFirstname = "Tom";
+  const [employeeName, setEmployeeName] = useState();
   const [tableData, setTableData] = useState([]);
+  const apiURL = "http://localhost:5000";
+  const [token, setToken] = useState("placeholder token");
+
+
+  const handleLogout = () => {
+    setToken(null);
+  };
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/my-table-data")
+      .get(apiURL + "/employee")
+      .then((response) => setEmployeeName(response.firstName))
+      .catch((error) => console.log(error));
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(apiURL + "/claimData")
       .then((response) => setTableData(response.data))
       .catch((error) => console.log(error));
   }, []);
 
+  // Dummy data
+  if (employeeName === undefined) {
+    setEmployeeName("Tom");
+  }
   if (tableData.length === 0) {
     setTableData([
       {
@@ -55,26 +75,27 @@ export default function Dashboard() {
         CurrencyID: "CAD",
         Status: "Pending",
       },
-      {
-        claimID: "CLM567",
-        projectID: "PRJ890",
-        Amount: 2500,
-        CurrencyID: "AUD",
-        Status: "Approved",
-      },
     ]);
   }
 
   return (
     <>
       <Container component="main" maxWidth="lg">
-        <h1>Welcome {employeeFirstname}</h1>
+        <div style={{ display: 'flex'}}>
+        <h1>Welcome {employeeName}</h1>
+        <Button 
+        variant="contained" sx={{ml:100}}
+        onClick={handleLogout} 
+        >
+          Logout
+        </Button>
+        </div>
 
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell width="50">Claim No.</TableCell>
+                <TableCell width="5"></TableCell>
                 <TableCell>Claim ID</TableCell>
                 <TableCell>Project ID</TableCell>
                 <TableCell>Amount</TableCell>
@@ -96,14 +117,19 @@ export default function Dashboard() {
                   <TableCell>{row.Status}</TableCell>
                   <TableCell>
                     {row.Status === "Pending" ? (
-                      <Button color="primary" sx={{ ml: 2 }}>
+                      <Button
+                        color="primary"
+                        sx={{ ml: 2 }}
+                        component={Link}
+                        to="/EditClaim"
+                      >
                         Edit
                       </Button>
                     ) : null}
                     {row.Status === "Pending" ? (
-                      <Button color="secondary">
-                        Delete
-                      </Button>
+                      <IconButton aria-label="delete" color="error">
+                        <Delete />
+                      </IconButton>
                     ) : null}
                   </TableCell>
                 </TableRow>
