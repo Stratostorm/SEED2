@@ -113,6 +113,12 @@ def login():
                 return {"message": "Failed to login!"}, 400
 
 
+@app.route("/logout", methods=["GET"])
+def logout():
+    response = {"message": "logout successful"}
+    unset_jwt_cookies(response)
+    return response
+
 @app.route('/DepartmentData', methods=['POST', 'GET'])
 def DepartmentData():
     if request.method == "GET":
@@ -195,20 +201,32 @@ def GetProjectExpenseClaimsData():
 
     if request.method == 'PUT':
         #  Declare DB
-        ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+        ProjectExpenseClaimsData = db['ProjectExpenseClaims'].find()
+        ProjectExpenseClaimsData = ProjectExpenseClaimsData[0]['tables'][0]['columns']
         #  Claim data from request
         data = request.json
-        ProjectExpenseClaimsData.update_one(
-            {'tables.columns.ClaimID': data['ClaimID']},
-            {'$set': {
-                'tables.$[].columns.$[x].Amount': data['Amount'],
-                'tables.$[].columns.$[x].Purpose': data['Purpose'],
-                'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
-            }
-            },
-            array_filters=[{'x.ClaimID': data['ClaimID']}])
+        ClaimID = data['ClaimID']
+        for item in ProjectExpenseClaimsData:
+            if item["ClaimID"] == "Approved":
+                return "Only Pending/Rejected Claims can be updated!!"
+            else:
+                ProjectExpenseClaimsData = db['ProjectExpenseClaimsData']
+                data=request.json
 
-        return "Data updated successfully!!"
+                ProjectExpenseClaimsData.update_one(
+                    {'tables.columns.ClaimID': data['ClaimID']},
+                        {'$set': {
+                        'tables.$[].columns.$[x].Amount': data['Amount'],
+                        'tables.$[].columns.$[x].Purpose': data['Purpose'],
+                        'tables.$[].columns.$[x].LastEditedClaim': "2023-05-06T10:00:00+08:00",
+                        'tables.$[].columns.$[x].CurrencyID': data['CurrencyID'],
+                        'tables.$[].columns.$[x].ProjectID': data['ProjectID'],
+                        'tables.$[].columns.$[x].ExpenseDate': data['ExpenseDate']
+                        }
+                    },
+                    array_filters=[{'x.ClaimID': data['ClaimID']}])
+
+                return "Data updated successfully!!"
 
 
 @app.route('/EmployeeDataName', methods=['GET'])
