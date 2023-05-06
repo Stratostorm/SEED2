@@ -79,7 +79,9 @@ def GetProjectExpenseClaimsData():
                         {'$set': {
                         'tables.$[].columns.$[x].Amount': data['Amount'],
                         'tables.$[].columns.$[x].Purpose': data['Purpose'],
-                        'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
+                        'tables.$[].columns.$[x].LastEditedClaimDate': "2023-05-06T10:00:00+08:00",
+                        'tables.$[].columns.$[x].CurrencyID': data['CurrencyID'],
+                        'tables.$[].columns.$[x].ProjectID': data['ProjectID'],
                         }
                         }, 
                         array_filters=[{'x.ClaimID': data['ClaimID']}])
