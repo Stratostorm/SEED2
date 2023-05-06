@@ -37,7 +37,7 @@ def EmployeeData():
 def EmployeeProjectData():
     if request.method == "GET":
         EmployeeID = '10011'
-        EmployeeProjectData = db['EmployeepProjects'].find()
+        EmployeeProjectData = db['EmployeeProjects'].find()
         EmployeeProjectData = EmployeeProjectData[0]['tables'][0]['columns']
 
         res = []
@@ -48,7 +48,7 @@ def EmployeeProjectData():
 
         return res
 
-@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET'])
+@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET', 'PUT'])
 def GetProjectExpenseClaimsData():
     if request.method == "GET":
         EmployeeID = '10011'
@@ -73,6 +73,18 @@ def GetProjectExpenseClaimsData():
         # project ID needs to be existing project
 
         return 'Data added to ProjectExpenseClaims'
+
+    if request.method == "PUT":
+        #  Declare DB
+        ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+        #  Claim data from request
+        data = request.json
+        # Insert data into MongoDB
+        ProjectExpenseClaimsData.update_one({'tables.columns.ClaimID': '11157'},{'$set': {'tables.$[].columns.$[x].Amount': "2000"}}, array_filters=[{'x.ClaimID': '11157'}])
+        # need to add prev claim ID
+        # project ID needs to be existing project
+
+        return 'Claims Updated'
 
 @app.route('/EmployeeDataName', methods=['GET'])
 def GetEmployeeName():
