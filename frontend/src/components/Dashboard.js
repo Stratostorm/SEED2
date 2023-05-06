@@ -29,8 +29,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(apiURL + "/EmployeeData")
-      .then((response) => setEmployeeName(response.firstName))
+      .get(apiURL + "/EmployeeDataName")
+      .then((response) => setEmployeeName(response.data.FirstName))
       .catch((error) => console.log(error));
   }, []);
 
@@ -122,7 +122,11 @@ export default function Dashboard() {
                         color="primary"
                         sx={{ ml: 2 }}
                         component={Link}
-                        to="/EditClaim"
+                        to={{
+                          pathname: "/EditClaim",
+                          state: { row: row }
+                        }}
+                      
                       >
                         Edit
                       </Button>
