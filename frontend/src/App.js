@@ -21,8 +21,8 @@ function App() {
           />
           <Route
             path="/NewClaim"
-            //element={token ? <NewClaim /> : <Navigate to="/" />}
-            element={<NewClaim />}
+            //element={token ? <NewClaim token={token}/> : <Navigate to="/" />}
+            element={<NewClaim token={token}/>}
           />
         </Routes>
       </BrowserRouter>

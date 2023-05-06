@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Alert from "@mui/material/Alert";
@@ -16,16 +16,24 @@ import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-const currencies = ["SGD", "USD", "CNY", "HKD"];
+async function GetName(token, setFirstName, setLastName) {
+  setFirstName("John");
+  setLastName("Doe");
+}
 
-const projects = ["0001", "0002", "0003", "0004"];
+async function GetData(token, setCurrencies, setProjects) {
+  setCurrencies(["SGD", "USD", "CNY", "HKD"]);
+  setProjects(["0001", "0002", "0003", "0004"])
+}
 
-const firstName = "John";
-
-const lastName = "Doe";
-
-export default function NewClaim() {
+export default function NewClaim({ token }) {
   const [isFollowUp, setIsFollowUp] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [currencies, setCurrencies] = useState([]);
+  const [projects, setProjects] = useState([]);
+
+
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -35,6 +43,12 @@ export default function NewClaim() {
     setIsFollowUp(e.target.checked);
   }
 
+  useEffect(() => {
+    GetName(token, setFirstName, setLastName);
+    GetData(token, setCurrencies, setProjects);
+    return () => {}
+  }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects])
+
   return (
     <Container component="main" maxWidth="sm">
       <CssBaseline />
@@ -43,10 +57,10 @@ export default function NewClaim() {
           marginTop: 8,
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: "normal",
         }}
       >
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" align="center">
           Create New Claim
         </Typography>
         <Stack
@@ -56,7 +70,7 @@ export default function NewClaim() {
           component="form"
           onSubmit={handleSubmit}
           noValidate
-          sx={{ mt: 1 }}
+          sx={{ mt: 2 }}
         >
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -68,7 +82,7 @@ export default function NewClaim() {
               id="firstName"
               label="First Name"
               name="firstName"
-              value = {firstName}
+              value={firstName}
               InputLabelProps={{ shrink: true }}
               fullWidth
             />
@@ -77,7 +91,7 @@ export default function NewClaim() {
               id="lastName"
               label="Last Name"
               name="lastName"
-              value = {lastName}
+              value={lastName}
               InputLabelProps={{ shrink: true }}
               fullWidth
             />
@@ -88,7 +102,7 @@ export default function NewClaim() {
               label="Date *"
               name="date"
               format="DD/MM/YYYY"
-              sx={{ width: 0.5 }}
+              sx={{ width: {xs: 1, sm: 0.5} }}
             />
             <TextField
               required
@@ -97,7 +111,7 @@ export default function NewClaim() {
               name="projectId"
               helperText="Select relevant Project ID"
               select
-              sx={{ width: 0.5 }}
+              sx={{ width: {xs: 1, sm: 0.5} }}
             >
               {projects.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -113,7 +127,7 @@ export default function NewClaim() {
               label="Currency"
               name="currency"
               select
-              sx={{ width: 0.3 }}
+              sx={{ width: {xs: 1, sm: 0.3} }}
             >
               {currencies.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -126,30 +140,26 @@ export default function NewClaim() {
               id="amount"
               label="Amount"
               name="amount"
-              sx={{ width: 0.7 }}
+              sx={{ width: {xs: 1, sm: 0.7} }}
             />
           </Stack>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={1}
-            alignItems="center"
+          <FormGroup
+            row
+            sx={{ height: {xs: 1, sm: "60px"}, justifyContent: "space-between" }}
           >
-            <FormGroup>
-              <FormControlLabel
-                control={<Switch onChange={handleFollowUp} />}
-                label="Follow-up claim"
-              />
-            </FormGroup>
+            <FormControlLabel
+              control={<Switch onChange={handleFollowUp} />}
+              label="Follow-up claim"
+            />
             {isFollowUp && (
               <TextField
-                required
                 id="prevClaimId"
                 label="Previous Claim ID"
                 name="prevClaimId"
-                fullWidth
+                sx={{ width: {xs: 1, sm: 0.6}, position: "right" }}
               />
             )}
-          </Stack>
+          </FormGroup>
           <Button
             type="submit"
             fullWidth
