@@ -15,15 +15,24 @@ import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import {apiURL} from "../../Constants";
 
 async function GetName(token, setFirstName, setLastName) {
-  setFirstName("John");
-  setLastName("Doe");
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }
+  };
+  axios.get(apiURL+ "/name", config).then(response => {
+    const data = response.data();
+    setFirstName(data.FirstName);
+    setLastName(data.LastName);
+  })
 }
 
 async function GetData(token, setCurrencies, setProjects) {
+  axios.get(apiURL+ "/")
   setCurrencies(["SGD", "USD", "CNY", "HKD"]);
   setProjects(["0001", "0002", "0003", "0004"])
+  
 }
 
 export default function NewClaim({ token }) {

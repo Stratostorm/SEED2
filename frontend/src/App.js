@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import NewClaim from "./components/NewClaim";
+import NewClaim from "./components/Claims/NewClaim";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
