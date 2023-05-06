@@ -35,7 +35,7 @@ export default function Login({ setToken }) {
     setToken(token);
   }
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="sm">
       <CssBaseline />
       <Box
         sx={{
@@ -51,7 +51,7 @@ export default function Login({ setToken }) {
         <Typography component="h1" variant="h5">
           Best Consultancy Employee Claims
         </Typography>
-        {isError && <Alert severity="error">
+        {isError && <Alert severity="error" sx={{mt: 1}}>
             <AlertTitle>Error</AlertTitle>
           Incorrect Employee ID or password. Please check and try again.
           </Alert>
