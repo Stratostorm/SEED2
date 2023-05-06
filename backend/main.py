@@ -72,7 +72,7 @@ def GetProjectExpenseClaimsData():
         # need to add prev claim ID
         # project ID needs to be existing project
 
-        return 'Data added to ProjectExpenseClaims'
+        return 'Data added to Claims'
 
     if request.method == "PUT":
         #  Declare DB
