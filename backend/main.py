@@ -61,23 +61,29 @@ def GetProjectExpenseClaimsData():
         return 'Data added to ProjectExpenseClaims'
     
     if request.method == 'PUT':
-        #  Declare DB
-        ProjectExpenseClaimsData = db['ProjectExpenseClaims']
-        #  Claim data from request
+        ProjectExpenseClaimsData = db['ProjectExpenseClaims'].find()
+        ProjectExpenseClaimsData = ProjectExpenseClaimsData[0]['tables'][0]['columns']
         data = request.json
-        ProjectExpenseClaimsData.update_one(
-            {'tables.columns.ClaimID': data['ClaimID']},
-            {'$set': {
-             'tables.$[].columns.$[x].Amount': data['Amount'],
-             'tables.$[].columns.$[x].Purpose': data['Purpose'],
-             'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
-            }
-            }, 
-             array_filters=[{'x.ClaimID': data['ClaimID']}])
-        
-        return "Data updated successfully!!"
-
-    
-
+        ClaimID = data['ClaimID']
+        for item in ProjectExpenseClaimsData:
+            if item["ClaimID"] == ClaimID:
+                if item['Status'] == "Approved":
+                    return "Only Pending/Rejected Claims can be updated!!"
+                else:
+                    #  Declare DB
+                    ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+                    #  Claim data from request
+                    data = request.json
+                    ProjectExpenseClaimsData.update_one(
+                        {'tables.columns.ClaimID': data['ClaimID']},
+                        {'$set': {
+                        'tables.$[].columns.$[x].Amount': data['Amount'],
+                        'tables.$[].columns.$[x].Purpose': data['Purpose'],
+                        'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
+                        }
+                        }, 
+                        array_filters=[{'x.ClaimID': data['ClaimID']}])
+                    
+                    return "Data updated successfully!!"
 if __name__ == "__main__":
     app.run(debug=True)
