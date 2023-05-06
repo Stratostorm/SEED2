@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(apiURL + "/claimData")
+      .get(apiURL + "/claimdata")
       .then((response) => setTableData(response.data))
       .catch((error) => console.log(error));
   }, []);
@@ -81,14 +81,15 @@ export default function Dashboard() {
   return (
     <>
       <Container component="main" maxWidth="lg">
-        <div style={{ display: 'flex'}}>
-        <h1>Welcome {employeeName}</h1>
-        <Button 
-        variant="contained" sx={{ml:100}}
-        onClick={handleLogout} 
-        >
-          Logout
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems:'center'}}>
+          <h1>Welcome {employeeName}!</h1>
+          <Button 
+          variant="contained" sx={{height:40}}
+          color='warning'
+          onClick={handleLogout} 
+          >
+            Logout
+          </Button>
         </div>
 
         <TableContainer component={Paper}>
