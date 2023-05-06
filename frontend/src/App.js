@@ -18,7 +18,7 @@ function App() {
           <Route path="/" element={token ? <Navigate to="/Dashboard" /> : <Login setToken={setToken}/>} />
           <Route
             path="/Dashboard"
-            element={<Dashboard/>}
+            element={<Dashboard setToken={setToken}/>}
             // element={token ? <Dashboard /> : <Navigate to="/" />}
           />
           <Route

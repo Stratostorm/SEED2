@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useNavigate } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import {
@@ -16,11 +16,11 @@ import {
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { apiURL } from "../Constants";
+import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
+export default function Dashboard({setToken}) {
   const [employeeName, setEmployeeName] = useState();
   const [tableData, setTableData] = useState([]);
-  const [token, setToken] = useState("placeholder token");
   const navigate = useNavigate();
 
 
