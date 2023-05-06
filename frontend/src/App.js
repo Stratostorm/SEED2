@@ -10,16 +10,11 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-<<<<<<< Updated upstream
           <Route path="/" element={<Login />} />
           <Route
             path="/Dashboard/:eId"
             element={token ? <Dashboard /> : <Navigate to="/" />}
           />
-=======
-          <Route path= "/" element={<Login />} />
-
->>>>>>> Stashed changes
         </Routes>
       </BrowserRouter>
     </div>
