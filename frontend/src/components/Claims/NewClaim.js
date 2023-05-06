@@ -22,7 +22,7 @@ async function GetName(token, setFirstName, setLastName) {
   };
   axios.get(apiURL + "/EmployeeDataName", config).then(
     (response) => {
-      const data = response.data();
+      const data = response.data;
       setFirstName(data.FirstName);
       setLastName(data.LastName);
     },
@@ -39,8 +39,9 @@ async function GetCurrencies(token, setCurrencies) {
   };
   axios.get(apiURL + "/CurrencyData", config).then(
     (response) => {
-      const data = response.data();
-      setCurrencies(data.currencies);
+      const data = response.data;
+      const currencies = data.map(x=>x.CurrencyID);
+      setCurrencies(currencies);
     },
     (error) => {
       //setCurrencies(["SGD", "USD", "CNY", "HKD"]);
@@ -55,7 +56,8 @@ async function GetProjects(token, setProjects) {
   };
   axios.get(apiURL + "/EmployeeProjectData", config).then(
     (response) => {
-      const data = response.data();
+      const data = response.data;
+      const projects = data.map(x=>x.ProjectID)
       setProjects(data.projects);
     },
     (error) => {
