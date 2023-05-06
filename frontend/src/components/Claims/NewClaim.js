@@ -58,7 +58,7 @@ async function GetProjects(token, setProjects) {
     (response) => {
       const data = response.data;
       const projects = data.map(x=>x.ProjectID)
-      setProjects(data.projects);
+      setProjects(projects);
     },
     (error) => {
       //setProjects(["1", "2", "3", "4"]);
