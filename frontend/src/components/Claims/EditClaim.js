@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { Link, useNavigate } from "react-router-dom";
 
 import { apiURL } from "../../Constants";
 
@@ -19,15 +20,14 @@ async function GetName(token, setFirstName, setLastName) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/name", config).then(
+  axios.get(apiURL + "/EmployeeDataName", config).then(
     (response) => {
       const data = response.data();
       setFirstName(data.FirstName);
       setLastName(data.LastName);
     },
     (error) => {
-      setFirstName("John");
-      setLastName("Doe");
+      console.log(error);
     }
   );
 }
@@ -43,13 +43,14 @@ async function GetData(token, setCurrencies, setProjects) {
       setProjects(data.projects);
     },
     (error) => {
-      setCurrencies(["SGD", "USD", "CNY", "HKD"]);
-      setProjects(["0001", "0002", "0003", "0004"]);
+      console.log(error);
     }
   );
 }
 
 export default function EditClaim({ token }) {
+  const navigate = useNavigate();
+
   const [isFollowUp, setIsFollowUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -61,6 +62,20 @@ export default function EditClaim({ token }) {
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    const form = {
+      CurrencyID: data.get("currency"),
+      ProjectID: data.get("projectId"),
+      ExpenseDate: data.get("date"),
+      Amount: data.get("amount"),
+      Purpose: data.get("purpose"),
+    };
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios.put(apiURL + "/ProjectExpenseClaimsData", form, config).then(
+      (response) => navigate("/Dashboard"),
+      (error) => console.log(error)
+    );
   }
 
   function handleFollowUp(e) {
@@ -204,10 +219,12 @@ export default function EditClaim({ token }) {
             sx={{ mt: 3, mb: 2 }}
           >
             <Button
+              component = {Link}
               type="button"
               variant="contained"
               color="warning"
               sx={{  width: { xs: 1, sm: 0.5 }}}
+              to="/Dashboard"
             >
               Back
             </Button>
