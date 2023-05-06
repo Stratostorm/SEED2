@@ -68,14 +68,27 @@ def add_password():
     return "<h1>Employee</h1>"
 '''
 # Test Password Hash
-@app.route("/checkpass")
-def check_pass():
+#@app.route("/checkpass")
+@app.route("login", methods=['POST'])
+def login():
+    if request.method == "POST":
+        data = request.json
+        employeeID = data.get("employeeId")
+        password = data.get("password")
+
+        employee_data = Employee.query.filter_by(EmployeeID = int(employeeID)).first()
+        result = check_password_hash(employee_data.Password, str(password))
+
+        return {"Result": result}
+
+    '''
     emp = Employee.query.filter_by(EmployeeID = 10001).first()
     result = check_password_hash(emp.Password, "Singa@123")
     result2 = check_password_hash(emp.Password, "Singa@122")
     print(result)
 
     return {"Result": result, "Result2": result2}
+    '''
 
 
 class Currency(db.Model):
