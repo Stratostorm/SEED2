@@ -32,17 +32,35 @@ async function GetName(token, setFirstName, setLastName) {
   );
 }
 
-async function GetData(token, setCurrencies, setProjects) {
+async function GetCurrencies(token, setCurrencies) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/listdata", config).then(
+  axios.get(apiURL + "/CurrencyData", config).then(
     (response) => {
-      const data = response.data();
-      setCurrencies(data.currencies);
+      const data = response.data;
+      const currencies = data.map(x=>x.CurrencyID);
+      setCurrencies(currencies);
+    },
+    (error) => {
+      //setCurrencies(["SGD", "USD", "CNY", "HKD"]);
+      console.log(error);
+    }
+  );
+}
+
+async function GetProjects(token, setProjects) {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  axios.get(apiURL + "/EmployeeProjectData", config).then(
+    (response) => {
+      const data = response.data;
+      const projects = data.map(x=>x.ProjectID)
       setProjects(data.projects);
     },
     (error) => {
+      //setProjects(["1", "2", "3", "4"]);
       console.log(error);
     }
   );
@@ -82,11 +100,10 @@ export default function EditClaim({ token }) {
     setIsFollowUp(e.target.checked);
   }
 
-  function handleBack(e) {}
-
   useEffect(() => {
     GetName(token, setFirstName, setLastName);
-    GetData(token, setCurrencies, setProjects);
+    GetCurrencies(token, setCurrencies);
+    GetProjects(token, setProjects);
     return () => {};
   }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects]);
 
