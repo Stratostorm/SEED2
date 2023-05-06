@@ -15,17 +15,38 @@ import {
   IconButton,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
+import { apiURL } from "../Constants";
+import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
+export default function Dashboard({setToken}) {
   const [employeeName, setEmployeeName] = useState();
   const [tableData, setTableData] = useState([]);
-  const apiURL = "http://localhost:5000";
-  const [token, setToken] = useState("placeholder token");
+  const navigate = useNavigate();
 
 
   const handleLogout = () => {
+    axios.get(apiURL +`/Logout`);
+    navigate('/');
     setToken(null);
   };
+
+  function HandleEdit(row) {
+    navigate('/EditClaim', { state: { row } });
+  }
+  
+
+  const handleDelete = (claimID) => {
+    axios.delete(apiURL +`/ProjectExpenseClaimsData`, claimID)
+      .then((response) => {
+        console.log(response);
+        const updatedData = tableData.filter((row) => row.ClaimID !== claimID);
+        setTableData(updatedData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
 
   useEffect(() => {
     axios
@@ -59,7 +80,6 @@ export default function Dashboard() {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell width="5"></TableCell>
                 <TableCell>Claim ID</TableCell>
                 <TableCell>Project ID</TableCell>
                 <TableCell>Amount</TableCell>
@@ -71,9 +91,6 @@ export default function Dashboard() {
             <TableBody>
               {tableData.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.id}
-                  </TableCell>
                   <TableCell>{row.ClaimID}</TableCell>
                   <TableCell>{row.ProjectID}</TableCell>
                   <TableCell>{row.Amount}</TableCell>
@@ -85,17 +102,16 @@ export default function Dashboard() {
                         color="primary"
                         sx={{ ml: 2 }}
                         component={Link}
-                        to={{
-                          pathname: "/EditClaim",
-                          state: { row: row }
-                        }}
-                      
+                        onClick={() => HandleEdit(row)}
                       >
                         Edit
                       </Button>
                     ) : null}
                     {row.Status === "Pending" ? (
-                      <IconButton aria-label="delete" color="error">
+                      <IconButton 
+                      aria-label="delete" 
+                      color="error"
+                      onClick={() => handleDelete(row.ClaimID)}>
                         <Delete />
                       </IconButton>
                     ) : null}

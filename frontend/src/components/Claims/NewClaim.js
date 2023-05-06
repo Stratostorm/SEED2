@@ -50,21 +50,19 @@ async function GetCurrencies(token, setCurrencies) {
 }
 
 async function GetProjects(token, setProjects) {
-  async function GetCurrencies(token, setCurrencies) {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    axios.get(apiURL + "/EmployeeProjectData", config).then(
-      (response) => {
-        const data = response.data();
-        setProjects(data.projects);
-      },
-      (error) => {
-        //setProjects(["1", "2", "3", "4"]);
-        console.log(error);
-      }
-    );
-  }
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+  axios.get(apiURL + "/EmployeeProjectData", config).then(
+    (response) => {
+      const data = response.data();
+      setProjects(data.projects);
+    },
+    (error) => {
+      //setProjects(["1", "2", "3", "4"]);
+      console.log(error);
+    }
+  );
 }
 
 export default function NewClaim({ token }) {
