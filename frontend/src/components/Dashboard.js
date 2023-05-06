@@ -108,7 +108,7 @@ export default function Dashboard() {
 
         <Button
           component={Link}
-          to="/AddNewClaim"
+          to="/NewClaim"
           variant="contained"
           sx={{ mt: 2 }}
         >
