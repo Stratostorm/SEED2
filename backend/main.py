@@ -74,17 +74,23 @@ def GetProjectExpenseClaimsData():
 
         return 'Data added to Claims'
 
-    if request.method == "PUT":
+    if request.method == 'PUT':
         #  Declare DB
         ProjectExpenseClaimsData = db['ProjectExpenseClaims']
         #  Claim data from request
         data = request.json
-        # Insert data into MongoDB
-        ProjectExpenseClaimsData.update_one({'tables.columns.ClaimID': '11157'},{'$set': {'tables.$[].columns.$[x].Amount': "2000"}}, array_filters=[{'x.ClaimID': '11157'}])
-        # need to add prev claim ID
-        # project ID needs to be existing project
+        ProjectExpenseClaimsData.update_one(
+            {'tables.columns.ClaimID': data['ClaimID']},
+            {'$set': {
+                'tables.$[].columns.$[x].Amount': data['Amount'],
+                'tables.$[].columns.$[x].Purpose': data['Purpose'],
+                'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
+            }
+            },
+            array_filters=[{'x.ClaimID': data['ClaimID']}])
 
-        return 'Claims Updated'
+        return "Data updated successfully!!"
+
 
 @app.route('/EmployeeDataName', methods=['GET'])
 def GetEmployeeName():
