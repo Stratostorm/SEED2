@@ -6,12 +6,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api, Resource
 from flask_cors import CORS
+import random
+import datetime
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
                                unset_jwt_cookies, jwt_required, JWTManager
 
 app =Flask(__name__)
 client = MongoClient('mongodb://localhost:27017')
-db = client['DBS']
+db = client['dbs']
 CORS(app)
 
 # JWT Key
@@ -29,7 +31,7 @@ def refresh_expiring_jwts(response):
             access_token = create_access_token(identity=get_jwt_identity())
             data = response.get_json()
             if type(data) is dict:
-                data["access_token"] = access_token 
+                data["access_token"] = access_token
                 response.data = json.dumps(data)
         return response
     except (RuntimeError, KeyError):
@@ -80,7 +82,7 @@ def hashpassword():
             },
             array_filters=[{'x.EmployeeID': id}])
     return "<h1>Hashed</h1>"
-        
+
 
 @app.route('/login', methods=['POST','GET'])
 def login():
@@ -101,7 +103,7 @@ def login():
 
 
             result = check_password_hash(res["Password"], str(password))
-            
+
             if result:
                 access_token = create_access_token(identity=res["EmployeeID"])
                 #login_user(res)
@@ -109,7 +111,7 @@ def login():
                 return {"token": access_token}
             else:
                 return {"message": "Failed to login!"}, 400
-        
+
 
 @app.route('/DepartmentData', methods=['POST', 'GET'])
 def DepartmentData():
@@ -136,7 +138,7 @@ def EmployeeData():
 def EmployeeProjectData():
     if request.method == "GET":
         EmployeeID = '10011'
-        EmployeeProjectData = db['EmployeepProjects'].find()
+        EmployeeProjectData = db['EmployeeProjects'].find()
         EmployeeProjectData = EmployeeProjectData[0]['tables'][0]['columns']
 
         res = []
@@ -147,7 +149,7 @@ def EmployeeProjectData():
 
         return res
 
-@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET'])
+@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET', 'PUT', 'DELETE'])
 def GetProjectExpenseClaimsData():
     if request.method == "GET":
         EmployeeID = '10011'
@@ -166,13 +168,31 @@ def GetProjectExpenseClaimsData():
         ProjectExpenseClaimsData = db['ProjectExpenseClaims']
         #  Claim data from request
         data = request.json
+        # add claim id
+        # eompoyee ID
+        # ChargeToDefaultDept
+        # AlternativeDeptCode
+        # Status
+        # LastEditedClaimDate = datetime.now
+        data['EmployeeID'] = "10001"
+
+        ClaimID_int = str(random.randint(0,100000))
+        print(ClaimID_int)
+
+        data['ClaimID'] = ClaimID_int
+        data['ChargeToDefaultDept'] = '1'
+        data['AlternativeDeptCode'] = '104'
+        data['Status'] = 'Pending'
+        t = datetime.datetime.now()
+        data['LastEditedClaimDate'] = t.isoformat()
+
         # Insert data into MongoDB
         ProjectExpenseClaimsData.update_one({ 'tables.name': 'projectexpenseclaims'},{'$push': {'tables.$[].columns': data}})
         # need to add prev claim ID
         # project ID needs to be existing project
 
-        return 'Data added to ProjectExpenseClaims'
-    
+        return 'Data added to Claims'
+
     if request.method == 'PUT':
         #  Declare DB
         ProjectExpenseClaimsData = db['ProjectExpenseClaims']
@@ -189,6 +209,7 @@ def GetProjectExpenseClaimsData():
             array_filters=[{'x.ClaimID': data['ClaimID']}])
 
         return "Data updated successfully!!"
+
 
 @app.route('/EmployeeDataName', methods=['GET'])
 def GetEmployeeName():
