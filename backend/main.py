@@ -1,24 +1,51 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, flash, request, redirect, url_for, session, jsonify
+import json
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_ckeditor import CKEditor
 from werkzeug.utils import secure_filename
 import uuid as uuid
+from flask_cors import CORS
 import os
+from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
+                               unset_jwt_cookies, jwt_required, JWTManager
 
 # Create a Flask Instance
 app = Flask(__name__)
+CORS(app)
+
+# JWT Key
+app.config["JWT_SECRET_KEY"] = "password"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+jwt = JWTManager(app)
+
+@app.after_request
+def refresh_expiring_jwts(response):
+    try:
+        exp_timestamp = get_jwt()["exp"]
+        now = datetime.now(timezone.utc)
+        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+        if target_timestamp > exp_timestamp:
+            access_token = create_access_token(identity=get_jwt_identity())
+            data = response.get_json()
+            if type(data) is dict:
+                data["access_token"] = access_token 
+                response.data = json.dumps(data)
+        return response
+    except (RuntimeError, KeyError):
+        # Case where there is not a valid JWT. Just return the original respone
+        return response
+
 
 # Add Database
 # Old SQLite DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 # New MySQL DB
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/users'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:shinying@localhost/expenseclaimsdata'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/expenseclaimsdata'
 # Secret Key for CSRF Token
 app.config['SECRET_KEY'] = "password"
 
@@ -70,7 +97,7 @@ def add_password():
 '''
 # Test Password Hash
 #@app.route("/checkpass")
-@app.route("login", methods=['POST'])
+@app.route("/login", methods=['POST'])
 def login():
     if request.method == "POST":
         data = request.json
@@ -80,7 +107,14 @@ def login():
         employee_data = Employee.query.filter_by(EmployeeID = int(employeeID)).first()
         result = check_password_hash(employee_data.Password, str(password))
 
-        return {"Result": result}
+        if result:
+            access_token = create_access_token(identity=employee_data.EmployeeID)
+            print(access_token)
+            return {"token": access_token}
+        else:
+            return {"message": "Failed to login!"}, 400
+
+        
 
     '''
     emp = Employee.query.filter_by(EmployeeID = 10001).first()
@@ -91,34 +125,21 @@ def login():
     return {"Result": result, "Result2": result2}
     '''
 
+@app.route('/Dashboard')
+@jwt_required()
+def Dashboard():
+    print("Reached Dashboard")
+    return {"message":"Dashboard"}
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    response = {"message": "logout successful"}
+    unset_jwt_cookies(response)
+    return response
+
 class Currency(db.Model):
     CurrencyID = db.Column(db.String(3), primary_key=True)
-    ExchangeRate = db.Column(db.Float)
-
-class Departments(db.Model):
-    DeparmentCode = db.Column(db.String(3), primary_key=True)
-    DeparmentName = db.Column(db.String(50))
-
-class EmployeeProjects(db.Model):
-    ProjectID = db.Column(db.Integer, primary_key=True)
-    EmployeeID = db.Column(db.Integer, db.ForeignKey('Employee.EmployeeID'))
-    ProjectName = db.Column(db.String(100))
-    ProjectStatus = db.Column(db.String(50))
-    ProjectBudget = db.Column(db.Float)
-    ProjectLeadID = db.Column(db.Integer)
-
-class ProjectExpenseClaims(db.Model):
-    ClaimID = db.Column(db.Integer, primary_key=True)
-    ProjectID = db.Column(db.Integer, db.ForeignKey('EmployeeProjects.ProjectID'))
-    EmployeeID = db.Column(db.Integer, db.ForeignKey('Employee.EmployeeID'))
-    currencyID = db.Column(db.String(3), db.ForeignKey('Currency.CurrencyID'))
-    ExpenseDate = db.Column(db.DateTime)
-    Amount = db.Column(db.Numeric(precision=10,scale=2))
-    Purpose = db.Column(db.String(255))
-    ChargeToDefaultDept = db.Column(db.Boolean)
-    AlternativeDefaultDept = db.Column(db.String(50))
-    Status = db.Column(db.String(20))
-    LastEditedClaimDate = db.Column(db.DateTime)
+    ExchangeRate = db.Column(db.Numeric(precision=10, scale=10))
 
 class Employee(db.Model):
     EmployeeID = db.Column(db.Integer, primary_key=True)
@@ -142,29 +163,3 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug = True)
-=======
-from flask import Flask, render_template, request, jsonify
-from pymongo import MongoClient
-from flask_restful import Api, Resource
-from flask_cors import CORS
-
-app =Flask(__name__)
-client = MongoClient('mongodb://localhost:27017')
-db = client['dbs']
-CORS(app)
-
-# @app.route('/')
-# def login():
-#     return render_template('login.js')
-
-@app.route('/DepartmentData', methods=['POST', 'GET'])
-def DepartmentData():
-    if request.method == "GET":
-        departmentData = db['Department'].find()
-        departmentData = departmentData[0]['tables'][0]['data']
-        return jsonify(departmentData)
-    
-
-if __name__ == "__main__":
-    app.run(debug=True)
->>>>>>> main
