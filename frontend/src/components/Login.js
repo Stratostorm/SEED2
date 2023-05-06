@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,19 +14,16 @@ import Container from "@mui/material/Container";
 
 const apiURL = "http://localhost:5000";
 
-async function loginUser(credentials) {
-  const body = new FormData();
-  body.append("employeeId", credentials["employeeId"]);
-  body.append("password", credentials["password"]);
+async function loginUser(credentials, setIsError) {
   return axios
-    .postForm(apiURL + "/login", {
-      employeeId: credentials["employeeId"],
-      password: credentials["password"],
+    .post(apiURL + "/login", credentials).catch(function (error) {
+      setIsError(true);
     })
     .then((response) => response.data);
 }
 
 export default function Login({ setToken }) {
+  const [isError, setIsError] = useState();
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -32,7 +31,7 @@ export default function Login({ setToken }) {
       employeeId: data.get("employeeId"),
       password: data.get("password"),
     };
-    const token = await loginUser(credentials);
+    const token = await loginUser(credentials, setIsError);
     setToken(token);
   }
   return (
@@ -52,6 +51,11 @@ export default function Login({ setToken }) {
         <Typography component="h1" variant="h5">
           Best Consultancy Employee Claims
         </Typography>
+        {isError && <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+          Incorrect Employee ID or password. Please check and try again.
+          </Alert>
+        }
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
