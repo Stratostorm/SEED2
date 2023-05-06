@@ -21,20 +21,22 @@ export default function Dashboard() {
   const [employeeName, setEmployeeName] = useState();
   const [tableData, setTableData] = useState([]);
   const [token, setToken] = useState("placeholder token");
+  const navigate = useNavigate();
 
 
   const handleLogout = () => {
+    axios.get(apiURL +`/Logout`);
+    navigate('/');
     setToken(null);
   };
 
   function HandleEdit(row) {
-    const navigate = useNavigate();
     navigate('/EditClaim', { state: { row } });
   }
   
 
   const handleDelete = (claimID) => {
-    axios.delete(apiURL +`/delete/${claimID}`)
+    axios.delete(apiURL +`/ProjectExpenseClaimsData`, claimID)
       .then((response) => {
         console.log(response);
         const updatedData = tableData.filter((row) => row.ClaimID !== claimID);
