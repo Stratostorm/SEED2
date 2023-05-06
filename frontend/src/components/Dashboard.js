@@ -41,43 +41,6 @@ export default function Dashboard() {
       .catch((error) => console.log(error));
   }, []);
 
-  // Dummy data
-  if (employeeName === undefined) {
-    setEmployeeName("Tom");
-  }
-  if (tableData.length === 0) {
-    setTableData([
-      {
-        claimID: "CLM123",
-        projectID: "PRJ456",
-        Amount: 1000,
-        CurrencyID: "USD",
-        Status: "Pending",
-      },
-      {
-        claimID: "CLM789",
-        projectID: "PRJ012",
-        Amount: 2000,
-        CurrencyID: "EUR",
-        Status: "Approved",
-      },
-      {
-        claimID: "CLM345",
-        projectID: "PRJ678",
-        Amount: 1500,
-        CurrencyID: "GBP",
-        Status: "Rejected",
-      },
-      {
-        claimID: "CLM901",
-        projectID: "PRJ234",
-        Amount: 3000,
-        CurrencyID: "CAD",
-        Status: "Pending",
-      },
-    ]);
-  }
-
   return (
     <>
       <Container component="main" maxWidth="lg">
