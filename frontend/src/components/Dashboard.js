@@ -1,47 +1,126 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
-import { Table, TableHead, TableBody, TableRow, TableCell, Button, Container } from "@mui/material";
+import { Link } from "react-router-dom";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  Container,
+  Paper,
+  TableContainer,
+} from "@mui/material";
 
 export default function Dashboard() {
-  const employeeFirstname = 'Tom';
+  const employeeFirstname = "Tom";
+  const [tableData, setTableData] = useState([]);
 
-  // call table from api
-  // useEffect(() => {
-  //   axios.get('http://localhost:5000/api/tabledata')
-  //     .then(response => setRows(response.data))
-  //     .catch(error => console.log(error));
-  // }, []);
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/my-table-data")
+      .then((response) => setTableData(response.data))
+      .catch((error) => console.log(error));
+  }, []);
 
-  return(
+  if (tableData.length === 0) {
+    setTableData([
+      {
+        claimID: "CLM123",
+        projectID: "PRJ456",
+        Amount: 1000,
+        CurrencyID: "USD",
+        Status: "Pending",
+      },
+      {
+        claimID: "CLM789",
+        projectID: "PRJ012",
+        Amount: 2000,
+        CurrencyID: "EUR",
+        Status: "Approved",
+      },
+      {
+        claimID: "CLM345",
+        projectID: "PRJ678",
+        Amount: 1500,
+        CurrencyID: "GBP",
+        Status: "Rejected",
+      },
+      {
+        claimID: "CLM901",
+        projectID: "PRJ234",
+        Amount: 3000,
+        CurrencyID: "CAD",
+        Status: "Pending",
+      },
+      {
+        claimID: "CLM567",
+        projectID: "PRJ890",
+        Amount: 2500,
+        CurrencyID: "AUD",
+        Status: "Approved",
+      },
+    ]);
+  }
+
+  return (
     <>
-    <h1>Welcome {employeeFirstname}</h1>
-    <Container component="main" maxWidth="lg">
-    <Table classname="claimsTable">
-      <TableHead>
-        <TableRow>
-          <TableCell>Claim ID</TableCell>
-          <TableCell>Project ID</TableCell>
-          <TableCell>Currency</TableCell>
-          <TableCell>Status</TableCell>
-          <TableCell></TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {[...Array(7)].map((_, rowIndex) => (
-          <TableRow key={rowIndex}>
-            {[...Array(5)].map((_, colIndex) => (
-              <TableCell key={colIndex}>{`Row ${rowIndex + 1}, Column ${colIndex + 1}`}</TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-    <Button component={Link} to="/AddNewClaim" variant="contained" sx={{mt:2}}>
-        Add new claim
-    </Button>
-    </Container>
-    </>
+      <Container component="main" maxWidth="lg">
+        <h1>Welcome {employeeFirstname}</h1>
 
-  ) 
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell width="50">Claim No.</TableCell>
+                <TableCell>Claim ID</TableCell>
+                <TableCell>Project ID</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell>Currency</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tableData.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.id}
+                  </TableCell>
+                  <TableCell>{row.claimID}</TableCell>
+                  <TableCell>{row.projectID}</TableCell>
+                  <TableCell>{row.Amount}</TableCell>
+                  <TableCell>{row.CurrencyID}</TableCell>
+                  <TableCell>{row.Status}</TableCell>
+                  <TableCell>
+                    {row.Status === "Pending" ? (
+                      <Button color="primary" sx={{ ml: 2 }}>
+                        Edit
+                      </Button>
+                    ) : null}
+                    {row.Status === "Pending" ? (
+                      <Button color="secondary">
+                        Delete
+                      </Button>
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Button
+          component={Link}
+          to="/AddNewClaim"
+          variant="contained"
+          sx={{ mt: 2 }}
+        >
+          Add new claim
+        </Button>
+      </Container>
+    </>
+  );
 }
