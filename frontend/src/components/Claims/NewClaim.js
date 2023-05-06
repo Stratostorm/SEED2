@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { Link, useNavigate } from "react-router-dom";
 
 import { apiURL } from "../../Constants";
 
@@ -19,7 +20,7 @@ async function GetName(token, setFirstName, setLastName) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/name", config).then(
+  axios.get(apiURL + "/EmployeeDataName", config).then(
     (response) => {
       const data = response.data();
       setFirstName(data.FirstName);
@@ -32,24 +33,43 @@ async function GetName(token, setFirstName, setLastName) {
   );
 }
 
-async function GetData(token, setCurrencies, setProjects) {
+async function GetCurrencies(token, setCurrencies) {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
-  axios.get(apiURL + "/listdata", config).then(
+  axios.get(apiURL + "/CurrencyData", config).then(
     (response) => {
       const data = response.data();
       setCurrencies(data.currencies);
-      setProjects(data.projects);
     },
     (error) => {
-      setCurrencies(["SGD", "USD", "CNY", "HKD"]);
-      setProjects(["0001", "0002", "0003", "0004"]);
+      //setCurrencies(["SGD", "USD", "CNY", "HKD"]);
+      console.log(error);
     }
   );
 }
 
+async function GetProjects(token, setProjects) {
+  async function GetCurrencies(token, setCurrencies) {
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios.get(apiURL + "/EmployeeProjectData", config).then(
+      (response) => {
+        const data = response.data();
+        setProjects(data.projects);
+      },
+      (error) => {
+        //setProjects(["1", "2", "3", "4"]);
+        console.log(error);
+      }
+    );
+  }
+}
+
 export default function NewClaim({ token }) {
+  const navigate = useNavigate();
+
   const [isFollowUp, setIsFollowUp] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -59,6 +79,20 @@ export default function NewClaim({ token }) {
   async function handleSubmit(e) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    const form = {
+      CurrencyID: data.get("currency"),
+      ProjectID: data.get("projectId"),
+      ExpenseDate: data.get("date"),
+      Amount: data.get("amount"),
+      Purpose: data.get("purpose"),
+    };
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    axios.post(apiURL + "/ProjectExpenseClaimsData", form, config).then(
+      (response) => navigate("/Dashboard"),
+      (error) => console.log(error)
+    );
   }
 
   function handleFollowUp(e) {
@@ -67,7 +101,8 @@ export default function NewClaim({ token }) {
 
   useEffect(() => {
     GetName(token, setFirstName, setLastName);
-    GetData(token, setCurrencies, setProjects);
+    GetCurrencies(token, setCurrencies);
+    GetProjects(token, setProjects);
     return () => {};
   }, [token, GetName, setFirstName, setLastName, setCurrencies, setProjects]);
 
@@ -143,13 +178,13 @@ export default function NewClaim({ token }) {
             </TextField>
           </Stack>
           <TextField
-              required
-              id="purpose"
-              label="Purpose"
-              name="purpose"
-              multiline
-              fullWidth
-            />
+            required
+            id="purpose"
+            label="Purpose"
+            name="purpose"
+            multiline
+            fullWidth
+          />
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
             <TextField
               required
@@ -200,17 +235,19 @@ export default function NewClaim({ token }) {
             sx={{ mt: 3, mb: 2 }}
           >
             <Button
+              component={Link}
               type="button"
               variant="contained"
               color="warning"
-              sx={{  width: { xs: 1, sm: 0.5 }}}
+              sx={{ width: { xs: 1, sm: 0.5 } }}
+              to="/Dashboard"
             >
               Back
             </Button>
             <Button
               type="submit"
               variant="contained"
-              sx={{ width: { xs: 1, sm: 0.5 }}}
+              sx={{ width: { xs: 1, sm: 0.5 } }}
             >
               Submit
             </Button>
