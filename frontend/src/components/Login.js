@@ -11,15 +11,12 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-
-const apiURL = "http://localhost:5000";
+import {apiURL} from "../Constants";
 
 async function loginUser(credentials, setIsError) {
   return axios
-    .post(apiURL + "/login", credentials).catch(function (error) {
-      setIsError(true);
-    })
-    .then((response) => response.data);
+    .post(apiURL + "/login", credentials)
+    .then((response) => response.data, (error)=>setIsError(true));
 }
 
 export default function Login({ setToken }) {
