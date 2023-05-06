@@ -40,13 +40,43 @@ def EmployeeProjectData():
         EmployeeProjectData = EmployeeProjectData[0]['tables'][0]['columns']
         return jsonify(EmployeeProjectData)
 
-@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET'])
-def ProjectExpenseClaimsData():
+@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET', 'PUT'])
+def GetProjectExpenseClaimsData():
     if request.method == "GET":
         ProjectExpenseClaimsData = db['ProjectExpenseClaims'].find()
         ProjectExpenseClaimsData = ProjectExpenseClaimsData[0]['tables'][0]['columns']
         return jsonify(ProjectExpenseClaimsData)
+
+    if request.method == "POST":
+        #  Declare DB
+        ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+        #  Claim data from request
+        data = request.json
+        # Insert data into MongoDB
+        ProjectExpenseClaimsData.update_one(
+            { 'tables.name': 'projectexpenseclaims'},
+            {'$push': {'tables.$[].columns': data}}
+        )
+
+        return 'Data added to ProjectExpenseClaims'
     
+    if request.method == 'PUT':
+        #  Declare DB
+        ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+        #  Claim data from request
+        data = request.json
+        ProjectExpenseClaimsData.update_one(
+            {'tables.columns.ClaimID': data['ClaimID']},
+            {'$set': {
+             'tables.$[].columns.$[x].Amount': data['Amount'],
+             'tables.$[].columns.$[x].Purpose': data['Purpose'],
+             'tables.$[].columns.$[x].LastEditedClaim': data['LastEditedClaimDate']
+            }
+            }, 
+             array_filters=[{'x.ClaimID': data['ClaimID']}])
+        
+        return "Data updated successfully!!"
+
     
 
 if __name__ == "__main__":
