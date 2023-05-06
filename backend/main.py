@@ -36,9 +36,17 @@ def EmployeeData():
 @app.route('/EmployeeProjectData', methods=['POST', 'GET'])
 def EmployeeProjectData():
     if request.method == "GET":
-        EmployeeProjectData = db['EmployeeProjects'].find()
+        EmployeeID = '10011'
+        EmployeeProjectData = db['EmployeepProjects'].find()
         EmployeeProjectData = EmployeeProjectData[0]['tables'][0]['columns']
-        return jsonify(EmployeeProjectData)
+
+        res = []
+        for project in EmployeeProjectData:
+            # print(project["EmployeeID"])
+            if str(project["EmployeeID"]) == EmployeeID:
+                res.append(project)
+
+        return res
 
 @app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET'])
 def GetProjectExpenseClaimsData():
