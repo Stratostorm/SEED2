@@ -29,14 +29,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(apiURL + "/employee")
+      .get(apiURL + "/EmployeeData")
       .then((response) => setEmployeeName(response.firstName))
       .catch((error) => console.log(error));
   }, []);
 
   useEffect(() => {
     axios
-      .get(apiURL + "/claimdata")
+      .get(apiURL + "/ProjectExpenseClaimsData")
       .then((response) => setTableData(response.data))
       .catch((error) => console.log(error));
   }, []);
@@ -111,8 +111,8 @@ export default function Dashboard() {
                   <TableCell component="th" scope="row">
                     {row.id}
                   </TableCell>
-                  <TableCell>{row.claimID}</TableCell>
-                  <TableCell>{row.projectID}</TableCell>
+                  <TableCell>{row.ClaimID}</TableCell>
+                  <TableCell>{row.ProjectID}</TableCell>
                   <TableCell>{row.Amount}</TableCell>
                   <TableCell>{row.CurrencyID}</TableCell>
                   <TableCell>{row.Status}</TableCell>
