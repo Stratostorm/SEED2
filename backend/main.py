@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from flask_restful import Api, Resource
 from flask_cors import CORS
+import random
+import datetime
 
 app =Flask(__name__)
 client = MongoClient('mongodb://localhost:27017')
@@ -48,7 +50,7 @@ def EmployeeProjectData():
 
         return res
 
-@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET', 'PUT'])
+@app.route('/ProjectExpenseClaimsData', methods=['POST', 'GET', 'PUT', 'DELETE'])
 def GetProjectExpenseClaimsData():
     if request.method == "GET":
         EmployeeID = '10011'
@@ -67,7 +69,30 @@ def GetProjectExpenseClaimsData():
         ProjectExpenseClaimsData = db['ProjectExpenseClaims']
         #  Claim data from request
         data = request.json
+        # add claim id
+        # eompoyee ID
+        # ChargeToDefaultDept
+        # AlternativeDeptCode
+        # Status
+        # LastEditedClaimDate = datetime.now
+        data['EmployeeID'] = "10001"
+
+        ClaimID_int = str(random.randint(0,100000))
+        print(ClaimID_int)
+
+        data['ClaimID'] = ClaimID_int
+        data['ChargeToDefaultDept'] = '1'
+        data['AlternativeDeptCode'] = '104'
+        data['Status'] = 'Pending'
+        t = datetime.datetime.now()
+        data['LastEditedClaimDate'] = t.isoformat()
+
         # Insert data into MongoDB
+        # ProjectID
+        # CurrencyID
+        # ExpenseDate
+        # Amount
+        # Purpose
         ProjectExpenseClaimsData.update_one({ 'tables.name': 'projectexpenseclaims'},{'$push': {'tables.$[].columns': data}})
         # need to add prev claim ID
         # project ID needs to be existing project
@@ -90,6 +115,39 @@ def GetProjectExpenseClaimsData():
             array_filters=[{'x.ClaimID': data['ClaimID']}])
 
         return "Data updated successfully!!"
+
+    if request.method == 'DELETE':
+        P = db['ProjectExpenseClaims'].find()
+        P = P[0]['tables'][0]['columns']
+        data = request.json
+        ClaimID = data["ClaimID"]
+
+        # ProjectExpenseClaimsData = db['ProjectExpenseClaims'].find()
+        # ProjectExpenseClaimsData = ProjectExpenseClaimsData[0]['tables'][0]['columns']
+        # res = []
+
+        for item in P:
+            if item['ClaimID'] == ClaimID:
+                if item['Status'] == 'Approved':
+                    return "Only pending claims can be deleted."
+                else:
+                    #  Declare DB
+                    ProjectExpenseClaimsData = db['ProjectExpenseClaims']
+                    #  Claim data from request
+                    data = request.json
+                    ProjectExpenseClaimsData.update_one({'$pull': {'tables.$[].columns.$[x]': data['ClaimID']}})
+                    return "Delete Successfully"
+
+        #
+        # for claim in ProjectExpenseClaimsData:
+        #     if claim["ClaimID"] == ClaimID:
+        #         res.append(claim)
+        #
+        # if Status == 'Pending':
+        #     ProjectExpenseClaimsData.delete_one({'ClaimID': ClaimID})
+        #     return "Data deleted successfully!!"
+        # else:
+
 
 
 @app.route('/EmployeeDataName', methods=['GET'])
