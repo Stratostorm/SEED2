@@ -14,7 +14,7 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDayjs} className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={token ? <Navigate to="/Dashboard" /> : <Login setToken={setToken}/>} />
           <Route
             path="/Dashboard/:eId"
             element={token ? <Dashboard /> : <Navigate to="/" />}
