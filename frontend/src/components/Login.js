@@ -11,15 +11,12 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-
-const apiURL = "http://localhost:5000";
+import {apiURL} from "../Constants";
 
 async function loginUser(credentials, setIsError) {
   return axios
-    .post(apiURL + "/login", credentials).catch(function (error) {
-      setIsError(true);
-    })
-    .then((response) => response.data);
+    .post(apiURL + "/login", credentials)
+    .then((response) => response.data, (error)=>setIsError(true));
 }
 
 export default function Login({ setToken }) {
@@ -35,7 +32,7 @@ export default function Login({ setToken }) {
     setToken(token);
   }
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="sm">
       <CssBaseline />
       <Box
         sx={{
@@ -51,7 +48,7 @@ export default function Login({ setToken }) {
         <Typography component="h1" variant="h5">
           Best Consultancy Employee Claims
         </Typography>
-        {isError && <Alert severity="error">
+        {isError && <Alert severity="error" sx={{mt: 1}}>
             <AlertTitle>Error</AlertTitle>
           Incorrect Employee ID or password. Please check and try again.
           </Alert>
